@@ -395,19 +395,24 @@
           <GroupName>Driver</GroupName>
           <Files>
             <File>
-              <FileName>Led_drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\Led_drv.c</FilePath>
-            </File>
-            <File>
-              <FileName>GPIO_conf.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\GPIO_conf.c</FilePath>
-            </File>
-            <File>
               <FileName>DWT.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\DWT.c</FilePath>
+            </File>
+            <File>
+              <FileName>Config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Driver\Config.h</FilePath>
+            </File>
+            <File>
+              <FileName>GPIO_iden.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\GPIO_iden.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\LED_drv.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -1,4 +1,4 @@
-#include "GPIO_conf.h"
+#include "GPIO_iden.h"
 
 uint32_t GPIO_GetPeriphAddr(uint8_t iden)
 {

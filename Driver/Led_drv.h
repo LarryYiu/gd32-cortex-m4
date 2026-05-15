@@ -4,7 +4,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "gd32f30x.h"
-#include "GPIO_conf.h"
+#include "GPIO_iden.h"
+#include "Config.h"
+
+#ifndef LED_GPIO_FREQENCY
+#define LED_GPIO_FREQENCY GPIO_OSPEED_2MHZ
+#endif
 
 struct Led
 {
@@ -14,24 +19,44 @@ struct Led
 typedef struct Led Led_t;
 
 /**
+ * **********************************************************************
  * @brief  Configures LED GPIO.
+ * **********************************************************************
  */
 void LED_Config(void);
 
 /**
+ * **********************************************************************
+ * @brief  Enables LED GPIO (sets to output push-pull mode).
+ * **********************************************************************
+ */
+void LED_Enable(void);
+
+/**
+ * **********************************************************************
+ * @brief  Disables LED GPIO (sets to analog input mode).
+ * **********************************************************************
+ */
+void LED_Disable(void);
+
+/**
+ * **********************************************************************
  * @brief  Get LED struct by index.
  * @param  index: LED index (0-based)
  *
  * @return Led_t struct with identifier and initial state (RESET)
  *
  * @note The index is indicated by the order of the __LED_IDEN_LOOKUP array
+ * **********************************************************************
  */
 Led_t LED_GetLedStruct(uint8_t index);
 
 /**
+ * **********************************************************************
  * @brief  Set the state of the given LED.
  * @param  led: Pointer to the LED struct
  * @param  stateIn: Desired state (SET for on, RESET for off)
+ * **********************************************************************
  */
 void LED_SetState(Led_t *led, bit_status stateIn);
 
