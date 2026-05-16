@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "gd32f30x.h"
-#include "GPIO_iden.h"
-#include "Config.h"
+#include "gpio_iden_parser.h"
+#include "config.h"
 
 void KEY_Config(void);
 

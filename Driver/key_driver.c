@@ -1,4 +1,4 @@
-#include "KEY_drv.h"
+#include "key_driver.h"
 
 #ifndef KEY_USE_BUSY_WAIT
 #define KEY_USE_BUSY_WAIT true
