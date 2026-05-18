@@ -7,9 +7,9 @@
 /*LED CONFIGURATION START*/
 
 #define LED_GPIO_LOOKUP \
-    GPIO_PIN(A,8), \
+    GPIO_PIN(F,6), \
     GPIO_PIN(E,6), \
-    GPIO_PIN(F,6)
+    GPIO_PIN(A,8)
 
 #define LED_GPIO_FREQENCY GPIO_OSPEED_2MHZ
 
