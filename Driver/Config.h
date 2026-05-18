@@ -6,10 +6,10 @@
 
 /*LED CONFIGURATION START*/
 
-#define LED_LOOK_UP \
-    GPIO_Ident(A,8), \
-    GPIO_Ident(E,6), \
-    GPIO_Ident(F,6)
+#define LED_GPIO_LOOKUP \
+    GPIO_PIN(A,8), \
+    GPIO_PIN(E,6), \
+    GPIO_PIN(F,6)
 
 #define LED_GPIO_FREQENCY GPIO_OSPEED_2MHZ
 
@@ -18,10 +18,10 @@
 /*KEY CONFIGURATION START*/
 
 #define KEY_LOOK_UP \
-    GPIO_Ident(A,0), \
-    GPIO_Ident(G,13), \
-    GPIO_Ident(G,14), \
-    GPIO_Ident(G,15)
+    GPIO_PIN(A,0), \
+    GPIO_PIN(G,13), \
+    GPIO_PIN(G,14), \
+    GPIO_PIN(G,15)
 
 #define KEY_GPIO_FREQENCY GPIO_OSPEED_2MHZ
 #define KEY_RELEASE_TRIGGER_DEFAULT true

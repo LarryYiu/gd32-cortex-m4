@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\App;.\Arm_kernel;.\Driver;.\GD32_lib</IncludePath>
+              <IncludePath>.\App;.\Arm_kernel;.\Driver;.\GD32_lib;.\GD32_lib\Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -395,24 +395,29 @@
           <GroupName>Driver</GroupName>
           <Files>
             <File>
-              <FileName>DWT.c</FileName>
+              <FileName>exti.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver\DWT.c</FilePath>
+              <FilePath>.\Driver\exti.c</FilePath>
             </File>
             <File>
-              <FileName>Config.h</FileName>
+              <FileName>dwt_delay.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\dwt_delay.c</FilePath>
+            </File>
+            <File>
+              <FileName>led_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\led_driver.c</FilePath>
+            </File>
+            <File>
+              <FileName>config.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\Driver\Config.h</FilePath>
+              <FilePath>.\Driver\config.h</FilePath>
             </File>
             <File>
-              <FileName>GPIO_iden.c</FileName>
+              <FileName>gpio_decoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\Driver\GPIO_iden.c</FilePath>
-            </File>
-            <File>
-              <FileName>LED_drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\LED_drv.c</FilePath>
+              <FilePath>.\Driver\gpio_decoder.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -420,19 +425,34 @@
           <GroupName>GD32_lib</GroupName>
           <Files>
             <File>
+              <FileName>gd32f30x_libopt.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\GD32_lib\gd32f30x_libopt.h</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_exti.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_exti.c</FilePath>
+            </File>
+            <File>
               <FileName>gd32f30x_gpio.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\GD32_lib\gd32f30x_gpio.c</FilePath>
+              <FilePath>.\GD32_lib\Source\gd32f30x_gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_misc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_misc.c</FilePath>
             </File>
             <File>
               <FileName>gd32f30x_rcu.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\GD32_lib\gd32f30x_rcu.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_libopt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GD32_lib\gd32f30x_libopt.h</FilePath>
+              <FilePath>.\GD32_lib\Source\gd32f30x_rcu.c</FilePath>
             </File>
           </Files>
         </Group>
