@@ -52,19 +52,16 @@ static void UART_Process(uint8_t data)
         case 1:
             if(g_rcvDataBuf[0] != FRAME_HEADER_H)
             {
-                printf("1 0x%02X \r\n", g_rcvDataBuf[0]);
                 s_lenRecv = 0;
             }
             return;
         case 2:
             if(g_rcvDataBuf[1] != FRAME_HEADER_L)
             {
-                printf("2 0x%02X \r\n", g_rcvDataBuf[1]);
                 s_lenRecv = 0;
             }
             return;
         case PACKAGE_DATA_LEN:
-            printf("received\r\n");
             s_lenRecv = 0;
             g_pktRcvd = true;
             return;
@@ -77,8 +74,8 @@ void USART0_IRQHandler(void)
 {
     if(usart_interrupt_flag_get(USART0, USART_INT_FLAG_RBNE) == SET)
     {
-        // usart_interrupt_flag_clear(USART0, USART_INT_RBNE);
         uint8_t uData = usart_data_receive(USART0); // this will clear the RBNE flag
+        UART_Process(uData);
     }
 }
 
@@ -91,7 +88,6 @@ void UART0_Task()
     }
     else
     {
-        printf("processing \r\n");
         if(XorCheckSum(g_rcvDataBuf, PACKAGE_DATA_LEN - 1) != g_rcvDataBuf[PACKAGE_DATA_LEN - 1])
         {
             return; // checksum error, discard the packet

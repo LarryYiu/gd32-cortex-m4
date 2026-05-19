@@ -424,6 +424,16 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\uart.c</FilePath>
             </File>
+            <File>
+              <FileName>systick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\systick.c</FilePath>
+            </File>
+            <File>
+              <FileName>wifi_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\wifi_driver.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -458,6 +468,11 @@
               <FileName>gd32f30x_rcu.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GD32_lib\Source\gd32f30x_rcu.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_dma.c</FilePath>
             </File>
           </Files>
         </Group>
