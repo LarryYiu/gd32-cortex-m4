@@ -12,9 +12,9 @@ int main(void)
     UART_Config(115200U);
     SYSTICK_Config();
     WIFI_Config();
-    uint8_t testData[] = "AT\r\n";
+    uint8_t testData[] = "AT+GMR\r\n";
 
-    WIFI_SendData(testData, 4);
+    WIFI_SendData(testData, 8);
     while(1)
     {
         // UART0_Task();
