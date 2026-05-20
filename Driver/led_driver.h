@@ -86,6 +86,23 @@ uint8_t LED_GetEncodedGPIO(uint8_t index);
 
 /**
  * **********************************************************************
+ * @brief  Toggle the state of the specified LED.
+ * @param  index: LED index (0-based)
+ * **********************************************************************
+ */
+void LED_Toggle(uint8_t index);
+
+/**
+ * **********************************************************************
+ * @brief  Get the current state of the specified LED.
+ * @param  index: LED index (0-based)
+ * @return Current state of the LED (SET for on, RESET for off)
+ * **********************************************************************
+ */
+FlagStatus LED_GetState(uint8_t index);
+
+/**
+ * **********************************************************************
  * @brief  Set the state of the given LED.
  * @param  index: LED index (0-based)
  * @param  stateIn: Desired state (SET for on, RESET for off)

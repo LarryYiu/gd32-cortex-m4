@@ -51,6 +51,17 @@ uint8_t LED_GetEncodedGPIO(uint8_t index)
     return __LED_GPIO_LOOKUP[index];
 }
 
+void LED_Toggle(uint8_t index)
+{
+    gpio_bit_write(__Leds[index].gpioPort, __Leds[index].gpioPin, __Leds[index].state ? RESET : SET);
+    __Leds[index].state = __Leds[index].state ? RESET : SET;
+}
+
+FlagStatus LED_GetState(uint8_t index)
+{
+    return __Leds[index].state;
+}
+
 void LED_SetState(uint8_t index, bit_status stateIn)
 {
     gpio_bit_write(__Leds[index].gpioPort, __Leds[index].gpioPin, stateIn);

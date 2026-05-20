@@ -2,22 +2,41 @@
 
 #include "systick.h"
 #include "led_driver.h"
-#include "exti.h"
 #include "uart.h"
-#include "wifi_driver.h"
+#include "key_driver.h"
+
+void onShortPress(void);
+void onLongPress(void);
+void onContinuousPress(uint8_t count);
 
 int main(void)
 {
+    SYSTICK_Config();
     LED_Config();
     UART_Config(115200U);
-    SYSTICK_Config();
-    WIFI_Config();
-    uint8_t testData[] = "AT+GMR\r\n";
+    KEY_Config();
 
-    WIFI_SendData(testData, 8);
+    // KEY_SetTriggerOnRelease(0, false);
+    KEY_AddShortPressListener(0, onShortPress);
+    KEY_AddLongPressListener(0, onLongPress);
+    KEY_AddContinuousPressListener(0, onContinuousPress);
     while(1)
     {
-        // UART0_Task();
-        WIFI_Task();
+        KEY_Scan(0);
     }
+}
+
+void onShortPress(void)
+{
+    LED_Toggle(0);
+}
+
+void onLongPress(void)
+{
+    LED_SetState(0, RESET);
+}
+
+void onContinuousPress(uint8_t count)
+{
+    printf("ContinuousPress: %hhu\n", count);
 }
