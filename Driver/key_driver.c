@@ -5,10 +5,6 @@
 #include "systick.h"
 #include "gpio_decoder.h"
 
-#ifndef KEY_USE_BUSY_WAIT
-#define KEY_USE_BUSY_WAIT true
-#endif
-
 #ifndef KEY_GPIO_FREQENCY
 #define KEY_GPIO_FREQENCY GPIO_OSPEED_2MHZ
 #endif
@@ -21,12 +17,12 @@
 #define KEY_DEBOUNCE_TIME_MS 10
 #endif
 
-#ifndef KEY_LONG_PRESS_THRESHOLD
-#define KEY_LONG_PRESS_THRESHOLD 5
+#ifndef KEY_LONG_PRESS_THRESHOLD_MS
+#define KEY_LONG_PRESS_THRESHOLD_MS 1000
 #endif
 
-#ifndef KEY_CONTINUOUS_PRESS_THRESHOLD
-#define KEY_CONTINUOUS_PRESS_THRESHOLD 3
+#ifndef KEY_CONTINUOUS_PRESS_THRESHOLD_MS
+#define KEY_CONTINUOUS_PRESS_THRESHOLD_MS 300
 #endif
 
 #define KEY_NUM len(__KEY_IDEN_LOOKUP)
@@ -184,9 +180,8 @@ static void __OnReleasedState(Key_t* key)
     if(key->isPressing && key->isTriggerOnRelease)
     {
         uint64_t now = SYSTICK_GetSysRunTime();
-        if(now - key->lastReleasedAt >= KEY_CONTINUOUS_PRESS_THRESHOLD)
+        if(now - key->lastReleasedAt >= KEY_CONTINUOUS_PRESS_THRESHOLD_MS)
         {
-            printf("__trigger start, pressCount: %hhu\n", key->pressCount);
             key->lastReleasedAt = 0;
             if(key->pressCount >= 2 && key->onContinuousPress != NULL)
             {
@@ -194,7 +189,6 @@ static void __OnReleasedState(Key_t* key)
             }
             else if(key->onShortPress != NULL)
             {
-                printf("__calling short\n");
                 key->onShortPress();
             }
             key->pressCount = 0;
@@ -260,7 +254,7 @@ static void __OnPressedState(Key_t* key)
         uint64_t now = SYSTICK_GetSysRunTime();
         if(__IsNowPressing(key))
         {
-            if(now - key->pressedAt >= KEY_LONG_PRESS_THRESHOLD)
+            if(now - key->pressedAt >= KEY_LONG_PRESS_THRESHOLD_MS)
             {
                 key->stateHandler = __OnLongPressedState;
             }
@@ -281,31 +275,6 @@ static void __OnPressedState(Key_t* key)
  */
 static void __OnLongPressedState(Key_t* key)
 {
-    // if(!key->isTriggerOnRelease)
-    // {
-    //     if(key->onLongPress != NULL)
-    //     {
-    //         key->onLongPress();
-    //     }
-    // }
-    // else
-    // {
-    //     uint64_t now = SYSTICK_GetSysRunTime();
-    //     if(!__IsNowPressing(key))
-    //     {
-    //         key->isShortPressCalled = false;
-    //         key->lastReleasedAt     = now;
-    //         key->stateHandler       = __OnReleasedState;
-    //         if(key->onLongPress != NULL)
-    //         {
-    //             key->onLongPress();
-    //         }
-    //         key->pressCount     = 0;
-    //         key->lastReleasedAt = now;
-    //         key->isPressing     = false;
-    //     }
-    // }
-
     if(!__IsNowPressing(key))
     {
         uint64_t now            = SYSTICK_GetSysRunTime();

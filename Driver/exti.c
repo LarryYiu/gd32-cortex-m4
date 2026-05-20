@@ -1,27 +1,37 @@
 #include "exti.h"
 #include "gd32f30x.h"
+#include "led_driver.h"
 
-void EXTI_Config(uint8_t encodedGPIO, exti_mode_enum extiMode, exti_trig_type_enum triggerType, uint8_t prePriority,
-                 uint8_t subPriority)
+/* Code adapted from D. Ye */
+
+void EXTI_Config(void)
 {
-    uint8_t gpioPin            = encodedGPIO & 0x0F;
-    exti_line_enum extiLineBit = (exti_line_enum)BIT(gpioPin);
+    /*使能GPIO的时钟*/
+    rcu_periph_clock_enable(RCU_GPIOA);
+    rcu_periph_clock_enable(RCU_GPIOG);
+    /*配置按键的IO为浮空输入模式*/
+    gpio_init(GPIOA, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_2MHZ, GPIO_PIN_0);
+    gpio_init(GPIOG, GPIO_MODE_IN_FLOATING, GPIO_OSPEED_2MHZ, GPIO_PIN_13);
+
+    /* 使能EXTI时钟 */
     rcu_periph_clock_enable(RCU_AF);
-    gpio_exti_source_select(encodedGPIO >> 4, gpioPin);
-    exti_init(extiLineBit, extiMode, triggerType);
-    exti_interrupt_flag_clear(extiLineBit);
-    if(gpioPin <= 4)
-    {
-        nvic_irq_enable((IRQn_Type)(EXTI0_IRQn + gpioPin), prePriority, subPriority);
-    }
-    else if(gpioPin <= 9)
-    {
-        nvic_irq_enable(EXTI5_9_IRQn, prePriority, subPriority);
-    }
-    else
-    {
-        nvic_irq_enable(EXTI10_15_IRQn, prePriority, subPriority);
-    }
+    /* 配置I/O连接到EXTI线 */
+    gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOA, GPIO_PIN_SOURCE_0);
+    /* 配置上升/下降沿 */
+    exti_init(EXTI_0, EXTI_INTERRUPT, EXTI_TRIG_FALLING);
+    /* 清除标志 */
+    exti_interrupt_flag_clear(EXTI_0);
+    /* 使能中断 */
+    nvic_irq_enable(EXTI0_IRQn, 1, 1);
+
+    /* 配置I/O连接到EXTI线 */
+    gpio_exti_source_select(GPIO_PORT_SOURCE_GPIOG, GPIO_PIN_SOURCE_13);
+    /* 配置上升/下降沿 */
+    exti_init(EXTI_13, EXTI_INTERRUPT, EXTI_TRIG_FALLING);
+    /* 清除标志 */
+    exti_interrupt_flag_clear(EXTI_13);
+    /* 使能中断 */
+    nvic_irq_enable(EXTI10_15_IRQn, 0, 1);
 }
 
 void EXTI_DisableAll(void)
@@ -74,6 +84,7 @@ void EXTI_Enable(exti_line_enum extiLine, uint8_t prePriority, uint8_t subPriori
         nvic_irq_enable(EXTI10_15_IRQn, prePriority, subPriority);
     }
 }
+
 void EXTI_Disable(exti_line_enum extiLine)
 {
     exti_interrupt_disable(extiLine);
@@ -100,5 +111,5 @@ void EXTI_Disable(exti_line_enum extiLine)
 void EXTI0_IRQHandler(void)
 {
     exti_interrupt_flag_clear(EXTI_0);
-    // do something
+    LED_Toggle(0);
 }

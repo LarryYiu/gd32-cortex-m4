@@ -13,8 +13,7 @@
 #include <stdbool.h>
 #include "gd32f30x.h"
 
-void EXTI_Config(uint8_t encodedGPIO, exti_mode_enum extiMode, exti_trig_type_enum triggerType, uint8_t prePriority,
-                 uint8_t subPriority);
+void EXTI_Config(void);
 
 void EXTI_DisableAll(void);
 
