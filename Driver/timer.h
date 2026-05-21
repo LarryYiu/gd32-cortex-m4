@@ -8,5 +8,6 @@ void TIMER_Init(void);
 void PWM_Test(void);
 
 uint32_t TIMER5_GetCount(void);
+void TIMER5_Clear(void);
 
 #endif // __TIMER_H__
