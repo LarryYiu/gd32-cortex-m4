@@ -439,6 +439,11 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\key_driver.c</FilePath>
             </File>
+            <File>
+              <FileName>timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\timer.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -478,6 +483,11 @@
               <FileName>gd32f30x_dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GD32_lib\Source\gd32f30x_dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_timer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_timer.c</FilePath>
             </File>
           </Files>
         </Group>

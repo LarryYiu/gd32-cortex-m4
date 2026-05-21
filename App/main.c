@@ -4,6 +4,7 @@
 #include "led_driver.h"
 #include "uart.h"
 #include "key_driver.h"
+#include "timer.h"
 
 void onShortPress(void);
 void onLongPress(void);
@@ -12,17 +13,18 @@ void onContinuousPress(uint8_t count);
 int main(void)
 {
     SYSTICK_Config();
-    LED_Config();
+    // LED_Config();
     UART_Config(115200U);
     KEY_Config();
+    TIMER_Init();
 
-    // KEY_SetTriggerOnRelease(0, false);
     KEY_AddShortPressListener(0, onShortPress);
     KEY_AddLongPressListener(0, onLongPress);
     KEY_AddContinuousPressListener(0, onContinuousPress);
     while(1)
     {
-        KEY_Scan(0);
+        // KEY_Scan(0);
+        PWM_Test();
     }
 }
 
