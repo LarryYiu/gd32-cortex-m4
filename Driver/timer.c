@@ -6,9 +6,16 @@
 
 static uint32_t timer5Count = 0;
 
-void TIMER_Init(void)
+static void __GPIO_Config(void)
+{
+    rcu_periph_clock_enable(RCU_GPIOA);
+    gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_10MHZ, GPIO_PIN_8);
+}
+
+static void __TIMER_Config(void)
 {
     timer_parameter_struct timer_initpara;
+    /* TIMER5 configuration */
     rcu_periph_clock_enable(RCU_TIMER5);
     timer_deinit(TIMER5);
     timer_struct_para_init(&timer_initpara);
@@ -18,13 +25,9 @@ void TIMER_Init(void)
     timer_interrupt_enable(TIMER5, TIMER_INT_UP);
     nvic_irq_enable(TIMER5_IRQn, 0, 0);
 
-    rcu_periph_clock_enable(RCU_GPIOA);
-    gpio_init(GPIOA, GPIO_MODE_AF_PP, GPIO_OSPEED_10MHZ, GPIO_PIN_8);
-
+    /* TIMER0 configuration */
     rcu_periph_clock_enable(RCU_TIMER0);
     timer_deinit(TIMER0);
-
-    /* TIMER0 configuration */
     timer_struct_para_init(&timer_initpara);
     timer_initpara.prescaler = 119;
     timer_initpara.period    = 499;
@@ -39,8 +42,15 @@ void TIMER_Init(void)
     timer_channel_output_pulse_value_config(TIMER0, TIMER_CH_0, 0);
     timer_channel_output_mode_config(TIMER0, TIMER_CH_0, TIMER_OC_MODE_PWM0);
     timer_primary_output_config(TIMER0, ENABLE);
+
     timer_enable(TIMER0);
     timer_enable(TIMER5);
+}
+
+void TIMER_Init(void)
+{
+    __GPIO_Config();
+    __TIMER_Config();
 }
 
 // void TIMER0_UP_IRQHandler(void)

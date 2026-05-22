@@ -340,7 +340,7 @@
               <MiscControls></MiscControls>
               <Define></Define>
               <Undefine></Undefine>
-              <IncludePath>.\App;.\Arm_kernel;.\Driver;.\GD32_lib;.\GD32_lib\Include</IncludePath>
+              <IncludePath>.\App;.\Arm_kernel;.\Driver;.\GD32_lib;.\GD32_lib\Include;.\Protocol</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -444,6 +444,11 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\timer.c</FilePath>
             </File>
+            <File>
+              <FileName>pwm_capture.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\pwm_capture.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -503,6 +508,16 @@
               <FileName>startup_gd32f30x_hd.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\Arm_kernel\startup_gd32f30x_hd.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Protocol</GroupName>
+          <Files>
+            <File>
+              <FileName>ir_nec_parser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Protocol\ir_nec_parser.c</FilePath>
             </File>
           </Files>
         </Group>
