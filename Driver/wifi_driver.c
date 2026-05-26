@@ -1,88 +1,108 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 #include "wifi_driver.h"
 #include "gd32f30x.h"
 
 #define USART2_DATA_ADDR (USART2 + 0x04U) // USART_DATA register address
-#define PACKET_DATA_LEN (256)
-static uint8_t g_rcvDataBuf[PACKET_DATA_LEN];
+#define PACKET_DATA_LEN (1024)
+static char g_rcvDataBuf[PACKET_DATA_LEN];
 static bool g_pktRcvd;
 static uint32_t g_dataLen;
 
-void WIFI_Config(void)
+static void __GPIO_Config(void)
 {
+    /* Enable pin of wifi module */
     rcu_periph_clock_enable(RCU_GPIOG);
     gpio_init(GPIOG, GPIO_MODE_OUT_PP, GPIO_OSPEED_10MHZ, GPIO_PIN_7);
     gpio_bit_set(GPIOG, GPIO_PIN_7); // set PG7 high to power on the WiFi module
 
+    /* Configure UART pins */
     rcu_periph_clock_enable(RCU_GPIOB);
     gpio_init(GPIOB, GPIO_MODE_AF_PP, GPIO_OSPEED_10MHZ, GPIO_PIN_10);
     gpio_init(GPIOB, GPIO_MODE_IPU, GPIO_OSPEED_10MHZ, GPIO_PIN_11);
+}
 
-    /* 使能UART时钟；*/
+static void __UART_Config(void)
+{
     rcu_periph_clock_enable(RCU_USART2);
-    /* 复位UART；*/
     usart_deinit(USART2);
-
-    /* 通过USART_CTL0寄存器的WL设置字长；*/
-    /* 通过USART_CTL0寄存器的PCEN设置校验位；*/
-    /* 在USART_CTL1寄存器中写STB[1:0]位来设置停止位的长度；*/
-    /* 以上保持默认，8位数据位，1位停止位，没有奇偶校验位 */
-
-    /* 在USART_BAUD寄存器中设置波特率；*/
     usart_baudrate_set(USART2, 115200U);
-    /* 在USART_CTL0寄存器中设置TEN位，使能发送功能；*/
     usart_transmit_config(USART2, USART_TRANSMIT_ENABLE);
-    /* 在USART_CTL0寄存器中设置REN位，使能接收功能；*/
     usart_receive_config(USART2, USART_RECEIVE_ENABLE);
-    /* 打开串口模块中的中断开关 */
-    // usart_interrupt_enable(USART2, USART_INT_RBNE);  // 接收非空中断
-    usart_interrupt_enable(USART2, USART_INT_IDLE); // 接收空闲中断
-    /* 打开串口dma接收数据功能 */
-    usart_dma_receive_config(USART2, USART_RECEIVE_DMA_ENABLE);
-    /* 打开NVIC中的中断开关 */
+    usart_interrupt_enable(USART2, USART_INT_IDLE);
+    usart_dma_receive_config(USART2, USART_RECEIVE_DMA_ENABLE); // enable DMA for USART2 reception
     nvic_irq_enable(USART2_IRQn, 0, 0);
-    /* 在USART_CTL0寄存器中置位UEN位，使能UART；*/
     usart_enable(USART2);
+}
 
-    /* 使能DMA时钟；*/
+static void __DMA_Config(void)
+{
     rcu_periph_clock_enable(RCU_DMA0);
-    /* 复位DMA通道；*/
     dma_deinit(DMA0, DMA_CH2);
 
     dma_parameter_struct dmaStruct;
     dma_struct_para_init(&dmaStruct);
-    /* 配置传输方向；*/
+    /* Direction */
     dmaStruct.direction = DMA_PERIPHERAL_TO_MEMORY;
-    /* 配置数据源地址；*/
+    /* Source address */
     dmaStruct.periph_addr = USART2_DATA_ADDR;
-    /* 配置源地址是固定的还是增长的；*/
+    /* Source address increment */
     dmaStruct.periph_inc = DMA_PERIPH_INCREASE_DISABLE;
-    /* 配置源数据传输位宽；*/
+    /* Source data width */
     dmaStruct.periph_width = DMA_PERIPHERAL_WIDTH_8BIT;
 
-    /* 配置数据目的地址；*/
+    /* Destination address */
     dmaStruct.memory_addr = (uint32_t)g_rcvDataBuf;
-    /* 配置目的地址是固定的还是增长的；*/
+    /* Destination address increment */
     dmaStruct.memory_inc = DMA_MEMORY_INCREASE_ENABLE;
-    /* 配置目的数据传输位宽；*/
+    /* Destination data width */
     dmaStruct.memory_width = DMA_MEMORY_WIDTH_8BIT;
-    /* 配置数据传输最大次数；*/
+    /* Max number of data to transfer */
     dmaStruct.number = PACKET_DATA_LEN;
-    /* 配置DMA通道优先级；*/
+    /* DMA channel priority */
     dmaStruct.priority = DMA_PRIORITY_HIGH;
     dma_init(DMA0, DMA_CH2, &dmaStruct);
-    /* 使能DMA通道；*/
+    /* Enable DMA channel */
     dma_channel_enable(DMA0, DMA_CH2);
 }
 
-void WIFI_SendData(uint8_t* data, uint8_t len)
+void WIFI_EnableModule(void)
 {
-    for(uint8_t i = 0; i < len; i++)
+    gpio_bit_set(GPIOG, GPIO_PIN_7); // set PG7 high to power on the WiFi module
+}
+
+void WIFI_DisableModule(void)
+{
+    gpio_bit_reset(GPIOG, GPIO_PIN_7); // set PG7 low to power off the WiFi module
+}
+
+void WIFI_Init(void)
+{
+    __GPIO_Config();
+
+    __UART_Config();
+
+    __DMA_Config();
+}
+
+void WIFI_SendCommand(const char* cmd)
+{
+    for(uint8_t i = 0; cmd[i] != '\0'; i++)
     {
         while(RESET == usart_flag_get(USART2, USART_FLAG_TBE));
-        usart_data_transmit(USART2, data[i]);
+        usart_data_transmit(USART2, cmd[i]);
     }
+}
+
+void WIFI_SnapshotResponse(char* buffer)
+{
+    g_pktRcvd               = false;
+    g_rcvDataBuf[g_dataLen] = '\0';
+    printf("Packet len: %d\r\n", g_dataLen);
+    printf("%s\r\n", g_rcvDataBuf);
+    memcpy(buffer, g_rcvDataBuf, g_dataLen);
+    memset(g_rcvDataBuf, 0, PACKET_DATA_LEN); // clear the buffer after copying
 }
 
 void USART2_IRQHandler(void)
@@ -98,19 +118,7 @@ void USART2_IRQHandler(void)
     }
 }
 
-void WIFI_Task(void)
+bool WIFI_IsPacketReceived(void)
 {
-    if(g_pktRcvd)
-    {
-        g_pktRcvd = false;
-
-        printf("Packet len: %d\r\n", g_dataLen);
-        // for(uint8_t i = 8; i < g_dataLen; i++)
-        // {
-        //     printf("%02X ", g_rcvDataBuf[i]);
-        // }
-        // printf("\r\n");
-        g_rcvDataBuf[g_dataLen] = '\0'; // null terminate the received data
-        printf("%s\r\n", g_rcvDataBuf);
-    }
+    return g_pktRcvd;
 }

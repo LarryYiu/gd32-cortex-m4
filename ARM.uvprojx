@@ -389,6 +389,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\main.c</FilePath>
             </File>
+            <File>
+              <FileName>wifi_app.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\App\wifi_app.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -449,6 +454,11 @@
               <FileType>1</FileType>
               <FilePath>.\Driver\pwm_capture.c</FilePath>
             </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\adc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -493,6 +503,11 @@
               <FileName>gd32f30x_timer.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GD32_lib\Source\gd32f30x_timer.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_adc.c</FilePath>
             </File>
           </Files>
         </Group>

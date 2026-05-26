@@ -2,13 +2,18 @@
 #define __WIFI_DRIVER_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
-void WIFI_Config(void);
+void WIFI_Init(void);
 
-void WIFI_SendData(uint8_t* data, uint8_t len);
+void WIFI_EnableModule(void);
 
-void WIFI_Task(void);
+void WIFI_DisableModule(void);
 
-void WIFI_ReceiveData(uint8_t* buffer, uint8_t len);
+bool WIFI_IsPacketReceived(void);
+
+void WIFI_SendCommand(const char* cmd);
+
+void WIFI_SnapshotResponse(char* buffer);
 
 #endif // __WIFI_DRIVER_H__
