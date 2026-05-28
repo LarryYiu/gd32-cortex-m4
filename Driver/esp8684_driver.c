@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include "wifi_driver.h"
+#include "esp8684_driver.h"
 #include "gd32f30x.h"
 
 #define USART2_DATA_ADDR (USART2 + 0x04U) // USART_DATA register address
@@ -67,17 +67,17 @@ static void __DMA_Config(void)
     dma_channel_enable(DMA0, DMA_CH2);
 }
 
-void WIFI_EnableModule(void)
+void ESP8684_EnableModule(void)
 {
     gpio_bit_set(GPIOG, GPIO_PIN_7); // set PG7 high to power on the WiFi module
 }
 
-void WIFI_DisableModule(void)
+void ESP8684_DisableModule(void)
 {
     gpio_bit_reset(GPIOG, GPIO_PIN_7); // set PG7 low to power off the WiFi module
 }
 
-void WIFI_Init(void)
+void ESP8684_Init(void)
 {
     __GPIO_Config();
 
@@ -86,7 +86,7 @@ void WIFI_Init(void)
     __DMA_Config();
 }
 
-void WIFI_SendCommand(const char* cmd)
+void ESP8684_SendCommand(const char* cmd)
 {
     for(uint8_t i = 0; cmd[i] != '\0'; i++)
     {
@@ -95,7 +95,7 @@ void WIFI_SendCommand(const char* cmd)
     }
 }
 
-void WIFI_SnapshotResponse(char* buffer)
+void ESP8684_SnapshotResponse(char* buffer)
 {
     g_pktRcvd               = false;
     g_rcvDataBuf[g_dataLen] = '\0';
@@ -118,7 +118,7 @@ void USART2_IRQHandler(void)
     }
 }
 
-bool WIFI_IsPacketReceived(void)
+bool ESP8684_IsPacketReceived(void)
 {
     return g_pktRcvd;
 }
