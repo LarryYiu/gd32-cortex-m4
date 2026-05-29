@@ -21,9 +21,10 @@ enum COMM_STATE
     COMM_STATE_FAILED_RESPONSE
 };
 
-COMM_STATE_t AT_CmdHandler(AT_Cmd_t* cmd);
+COMM_STATE_t AT_CmdHandler(const AT_Cmd_t* cmd);
 
 COMM_STATE_t AT_Init(void);
 
+char* AT_GetResponseSnapshot(void);
 void AT_ClearResponseSnapshot(void);
 #endif // __AT_H__

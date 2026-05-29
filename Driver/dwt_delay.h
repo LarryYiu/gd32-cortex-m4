@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "gd32f30x.h"
 
-void DWT_Config(void);
+void DWT_Init(void);
 
 void DWT_On(void);
 

@@ -1,7 +1,10 @@
 #include "at.h"
 #include <string.h>
+#include <stdio.h>
 #include "systick.h"
 #include "esp8684_driver.h"
+
+#define DEBUG_PRINTING true
 
 static char __atResponseSnapshot[1024];
 void AT_ClearResponseSnapshot(void)
@@ -9,11 +12,16 @@ void AT_ClearResponseSnapshot(void)
     memset(__atResponseSnapshot, 0, 1024);
 }
 
+char* AT_GetResponseSnapshot(void)
+{
+    return __atResponseSnapshot;
+}
+
 typedef struct AT_FSM AT_FSM_t;
 struct AT_FSM
 {
     uint64_t sentCmdTime;
-    AT_Cmd_t* currentCmd;
+    const AT_Cmd_t* currentCmd;
     COMM_STATE_t (*stateHandler)(void);
 };
 
@@ -23,7 +31,7 @@ static COMM_STATE_t __onReceive(void);
 
 static AT_FSM_t __atFSM = {0ULL, NULL, __onSend};
 
-COMM_STATE_t AT_CmdHandler(AT_Cmd_t* cmd)
+COMM_STATE_t AT_CmdHandler(const AT_Cmd_t* cmd)
 {
     __atFSM.currentCmd = cmd;
     return __atFSM.stateHandler();
@@ -31,7 +39,13 @@ COMM_STATE_t AT_CmdHandler(AT_Cmd_t* cmd)
 
 static COMM_STATE_t __onSend(void)
 {
-    ESP8684_SendCommand(__atFSM.currentCmd->cmd);
+#if DEBUG_PRINTING
+    printf("[AT] Sending: [%s]\n", __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+#endif
+    if(__atFSM.currentCmd->cmd != NULL)
+    {
+        ESP8684_SendCommand(__atFSM.currentCmd->cmd);
+    }
     __atFSM.sentCmdTime  = SYSTICK_GetSysRunTime();
     __atFSM.stateHandler = __onWait;
     return COMM_STATE_PROCESSING;
@@ -44,6 +58,9 @@ static COMM_STATE_t __onWait(void)
     {
         retry = 0;
         ESP8684_SnapshotResponse(__atResponseSnapshot);
+#if DEBUG_PRINTING
+        printf("[AT] Received: [%s], expected: [%s]\n", __atResponseSnapshot, __atFSM.currentCmd->desiredResponse);
+#endif
         __atFSM.stateHandler = __onReceive;
         return COMM_STATE_PROCESSING;
     }
@@ -52,11 +69,19 @@ static COMM_STATE_t __onWait(void)
         __atFSM.stateHandler = __onSend;
         if(retry < __atFSM.currentCmd->maxRetry)
         {
+#if DEBUG_PRINTING
+            printf("[AT] Timed out when sending [%s], retrying\n",
+                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "[delay]");
+#endif
             retry++;
             return COMM_STATE_PROCESSING;
         }
         else
         {
+#if DEBUG_PRINTING
+            printf("[AT FAILED] Timed out when sending [%s]\n",
+                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+#endif
             retry              = 0;
             __atFSM.currentCmd = NULL;
             return COMM_STATE_FAILED_TIMER;
@@ -79,23 +104,30 @@ static COMM_STATE_t __onReceive(void)
         __atFSM.stateHandler = __onSend;
         if(retry < __atFSM.currentCmd->maxRetry)
         {
+#if DEBUG_PRINTING
+            printf("[AT] Recv Error when sending [%s], retrying...\n",
+                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+#endif
             retry++;
             return COMM_STATE_PROCESSING;
         }
         else
         {
+#if DEBUG_PRINTING
+            printf("[AT FAILED] Recv Error when sending [%s]\n",
+                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+#endif
             retry              = 0;
             __atFSM.currentCmd = NULL;
             return COMM_STATE_FAILED_RESPONSE;
         }
     }
-    return COMM_STATE_PROCESSING;
 }
 
 typedef enum
 {
     AT_RST,
-    AT_RST_DELAY,
+    AT_RST_WAIT,
     AT_E0,
     AT_CWMODE_1,
 } AT_INIT_CMD_INDEX_t;
@@ -108,11 +140,11 @@ static const AT_Cmd_t __AT_INIT_CMD[] = {
             .timeoutMs       = 500,
             .maxRetry        = 3,
         },
-    [AT_RST_DELAY] =
+    [AT_RST_WAIT] =
         {
             .cmd             = NULL,
-            .desiredResponse = "deadbeaf",
-            .timeoutMs       = 2000,
+            .desiredResponse = "ready",
+            .timeoutMs       = 3000,
             .maxRetry        = 0,
         },
     [AT_E0] =
@@ -133,48 +165,48 @@ static const AT_Cmd_t __AT_INIT_CMD[] = {
 
 COMM_STATE_t AT_Init(void)
 {
-    COMM_STATE_t commState                = COMM_STATE_PROCESSING;
-    static AT_INIT_CMD_INDEX_t atInitStep = AT_RST;
+    COMM_STATE_t commState           = COMM_STATE_PROCESSING;
+    static AT_INIT_CMD_INDEX_t atCmd = AT_RST;
 
-    switch(atInitStep)
+    switch(atCmd)
     {
         case AT_RST:
             commState = AT_CmdHandler(__AT_INIT_CMD + AT_RST);
             if(commState == COMM_STATE_OK)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_RST_DELAY;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_RST_WAIT;
             }
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
-                ClearRecvWifiStr();
+                AT_ClearResponseSnapshot();
                 return commState;
             }
             break;
-        case AT_RST_DELAY:
-            commState = AT_CmdHandler(__AT_INIT_CMD + AT_RST_DELAY);
+        case AT_RST_WAIT:
+            commState = AT_CmdHandler(__AT_INIT_CMD + AT_RST_WAIT);
             if(commState == COMM_STATE_OK)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_E0;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_E0;
             }
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_E0;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_E0;
             }
             break;
         case AT_E0:
             commState = AT_CmdHandler(__AT_INIT_CMD + AT_E0);
             if(commState == COMM_STATE_OK)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_CWMODE_1;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_CWMODE_1;
             }
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_RST;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_RST;
                 return commState;
             }
             break;
@@ -182,14 +214,14 @@ COMM_STATE_t AT_Init(void)
             commState = AT_CmdHandler(__AT_INIT_CMD + AT_CWMODE_1);
             if(commState == COMM_STATE_OK)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_RST;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_RST;
                 return COMM_STATE_OK;
             }
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
-                ClearRecvWifiStr();
-                atInitStep = AT_RST;
+                AT_ClearResponseSnapshot();
+                atCmd = AT_RST;
                 return commState;
             }
             break;

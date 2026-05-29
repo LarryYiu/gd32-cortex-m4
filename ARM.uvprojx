@@ -394,6 +394,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\wifi_app.c</FilePath>
             </File>
+            <File>
+              <FileName>iot_config.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\App\iot_config.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -435,11 +440,6 @@
               <FilePath>.\Driver\systick.c</FilePath>
             </File>
             <File>
-              <FileName>wifi_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\wifi_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>key_driver.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\key_driver.c</FilePath>
@@ -458,6 +458,16 @@
               <FileName>adc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>esp8684_driver.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Driver\esp8684_driver.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -509,6 +519,21 @@
               <FileType>1</FileType>
               <FilePath>.\GD32_lib\Source\gd32f30x_adc.c</FilePath>
             </File>
+            <File>
+              <FileName>gd32f30x_bkp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_bkp.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>gd32f30x_pmu.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GD32_lib\Source\gd32f30x_pmu.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -533,6 +558,16 @@
               <FileName>ir_nec_parser.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Protocol\ir_nec_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>at.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Protocol\at.c</FilePath>
+            </File>
+            <File>
+              <FileName>mqtt.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Protocol\mqtt.c</FilePath>
             </File>
           </Files>
         </Group>

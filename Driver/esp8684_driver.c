@@ -84,6 +84,9 @@ void ESP8684_Init(void)
     __UART_Config();
 
     __DMA_Config();
+
+    // ESP8684_DisableModule();
+    // ESP8684_EnableModule();
 }
 
 void ESP8684_SendCommand(const char* cmd)
@@ -97,20 +100,20 @@ void ESP8684_SendCommand(const char* cmd)
 
 void ESP8684_SnapshotResponse(char* buffer)
 {
-    g_pktRcvd               = false;
-    g_rcvDataBuf[g_dataLen] = '\0';
-    printf("Packet len: %d\r\n", g_dataLen);
-    printf("%s\r\n", g_rcvDataBuf);
+    g_pktRcvd = false;
+    // g_rcvDataBuf[g_dataLen] = '\0';
+    //  printf("Packet len: %d\r\n", g_dataLen);
+    //  printf("%s\r\n", g_rcvDataBuf);
     memcpy(buffer, g_rcvDataBuf, g_dataLen);
-    memset(g_rcvDataBuf, 0, PACKET_DATA_LEN); // clear the buffer after copying
+    memset(g_rcvDataBuf, 0, g_dataLen); // clear the buffer after copying
 }
 
 void USART2_IRQHandler(void)
 {
     if(usart_interrupt_flag_get(USART2, USART_INT_FLAG_IDLE) != RESET)
     {
-        g_dataLen = PACKET_DATA_LEN - dma_transfer_number_get(DMA0, DMA_CH2);
         usart_data_receive(USART2);
+        g_dataLen = PACKET_DATA_LEN - dma_transfer_number_get(DMA0, DMA_CH2);
         g_pktRcvd = true;
         dma_channel_disable(DMA0, DMA_CH2);
         dma_transfer_number_config(DMA0, DMA_CH2, PACKET_DATA_LEN);
