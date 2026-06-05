@@ -90,6 +90,20 @@ static COMM_STATE_t __onWait(void)
     return COMM_STATE_PROCESSING;
 }
 
+static const char* __ASYNC_RESPONSE_LIST[] = {"WIFI CONNECTED", "WIFI DISCONNECTED", "busy", "ready"};
+
+static bool __IsAsyncResponse(void)
+{
+    for(uint8_t i = 0; i < sizeof(__ASYNC_RESPONSE_LIST) / sizeof(__ASYNC_RESPONSE_LIST[0]); i++)
+    {
+        if(strstr(__atResponseSnapshot, __ASYNC_RESPONSE_LIST[i]) != NULL)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 static COMM_STATE_t __onReceive(void)
 {
     static uint8_t retry = 0;
@@ -98,6 +112,14 @@ static COMM_STATE_t __onReceive(void)
         __atFSM.stateHandler = __onSend;
         retry                = 0;
         return COMM_STATE_OK;
+    }
+    else if(__IsAsyncResponse())
+    {
+#if DEBUG_PRINTING
+        printf("[AT] Recv Async Response [%s], keep waiting\n", __atResponseSnapshot);
+#endif
+        __atFSM.stateHandler = __onWait;
+        return COMM_STATE_PROCESSING;
     }
     else
     {

@@ -33,7 +33,7 @@ typedef enum
 
 static const AT_Cmd_t __AT_CONNECT_INTERNET_CMD[] = {
     [AT_CWJAP_SSID_PWD] = {.cmd             = __AT_CWJAP_SSID_PWD_CMD,
-                           .desiredResponse = "WIFI CONNECTED",
+                           .desiredResponse = "GOT IP",
                            .timeoutMs       = 15000,
                            .maxRetry        = 3},
     [AT_CWJAP_DELAY]    = {.cmd = NULL, .desiredResponse = "OK", .timeoutMs = 5000, .maxRetry = 0},
@@ -79,10 +79,11 @@ static COMM_STATE_t __WIFI_ConnectInternet(void)
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
 #if DEBUG_PRINTING
-                printf("[WIFI] Delay Failed\n");
+                printf("[WIFI] Delay Done\n");
 #endif
                 AT_ClearResponseSnapshot();
-                atCmd = AT_CWJAP_SSID_PWD;
+                // atCmd                = AT_CWJAP_SSID_PWD;
+                wifiFsm.stateHandler = __WIFI_ConnectIotServer;
                 return commState;
             }
             break;
