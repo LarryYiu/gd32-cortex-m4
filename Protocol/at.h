@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define AT_BUSY_DELAY_MS 3000
+
 typedef struct AT_Cmd AT_Cmd_t;
 struct AT_Cmd
 {

@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "at.h"
-#include "mqtt.h"
 #include "iot_config.h"
 #include "systick.h"
 #include "rtc.h"
@@ -36,7 +35,7 @@ static const AT_Cmd_t __AT_CONNECT_INTERNET_CMD[] = {
                            .desiredResponse = "GOT IP",
                            .timeoutMs       = 15000,
                            .maxRetry        = 3},
-    [AT_CWJAP_DELAY]    = {.cmd = NULL, .desiredResponse = "OK", .timeoutMs = 5000, .maxRetry = 0},
+    [AT_CWJAP_DELAY]    = {.cmd = NULL, .desiredResponse = "OK", .timeoutMs = 2000, .maxRetry = 0},
 };
 
 static COMM_STATE_t __WIFI_ConnectInternet(void)
@@ -78,9 +77,9 @@ static COMM_STATE_t __WIFI_ConnectInternet(void)
             }
             else if(commState == COMM_STATE_FAILED_TIMER || commState == COMM_STATE_FAILED_RESPONSE)
             {
-#if DEBUG_PRINTING
-                printf("[WIFI] Delay Done\n");
-#endif
+                // #if DEBUG_PRINTING
+                //                 printf("[WIFI] Delay Done\n");
+                // #endif
                 AT_ClearResponseSnapshot();
                 // atCmd                = AT_CWJAP_SSID_PWD;
                 wifiFsm.stateHandler = __WIFI_ConnectIotServer;
@@ -101,12 +100,15 @@ typedef enum
 } AT_CONNECT_SERVER_CMD_INDEX_t;
 
 static const AT_Cmd_t __AT_CONNECT_SERVER_CMD[] = {
-    [AT_MQTTUSERCFG] = {.cmd             = MQTT_USERCFG_CMD("60", "0", "0"),
-                        .desiredResponse = "OK",
-                        .timeoutMs       = 300,
-                        .maxRetry        = 3},
-    [AT_MQTTCONN]    = {.cmd = MQTT_CONN_CMD("1"), .desiredResponse = "OK", .timeoutMs = 2000, .maxRetry = 3},
-    [AT_SNTPCFG]     = {.cmd = __AT_SNTPCFG_CMD, .desiredResponse = "OK", .timeoutMs = 500, .maxRetry = 0}};
+    [AT_MQTTUSERCFG] =
+        {.cmd = MQTT_USERCFG_CMD("1", "0", "0"),
+         //  .cmd = "AT+MQTTUSERCFG=0,1,\"GD32Board\",\"4m3RoDJR8n\",\"version=2018-10-31&res=products%2F4m3RoDJR8n%"
+         //         "2Fdevices%2FGD32Board&et=1830268800&method=md5&sign=qIQ8T1heqVLOZ23gunAFjg%3D%3D\",0,0,\"\"\r\n",
+         .desiredResponse = "OK",
+         .timeoutMs       = 300,
+         .maxRetry        = 3},
+    [AT_MQTTCONN] = {.cmd = MQTT_CONN_CMD("1"), .desiredResponse = "OK", .timeoutMs = 2000, .maxRetry = 3},
+    [AT_SNTPCFG]  = {.cmd = __AT_SNTPCFG_CMD, .desiredResponse = "OK", .timeoutMs = 500, .maxRetry = 0}};
 
 static COMM_STATE_t __WIFI_ConnectIotServer(void)
 {

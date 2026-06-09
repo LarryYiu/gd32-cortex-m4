@@ -47,11 +47,9 @@ static fmc_state_enum __Erase(uint32_t addr)
 /**
  * @brief Handle erasing of a single uneven page, inlcudes backup and resote
  *
- * @param addr the starting address of the area to be erased
- * @param addrOffset the offset of the starting address relative to the page starting address
+ * @param addrPageStart the starting address of the page
+ * @param addrEraseStart the starting address of the area to be erased
  * @param lenErasing the length to be erased
- * @param backupBuffer the address of the array backup the page
- *
  * @return erase success or fail
  */
 static bool __ProcessEraseSinglePage(uint32_t addrPageStart, uint32_t addrEraseStart, uint32_t lenErasing)
@@ -63,7 +61,7 @@ static bool __ProcessEraseSinglePage(uint32_t addrPageStart, uint32_t addrEraseS
     }
     else
     {
-        /* Back up the pgae */
+        /* Back up the page */
         memcpy(backupBuffer, (const void*)addrPageStart, FLASH_PAGE_SIZE);
         printf("[Flash Backup] backup finished\r\n");
 

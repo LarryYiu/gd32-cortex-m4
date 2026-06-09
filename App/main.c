@@ -21,7 +21,7 @@ int main(void)
 {
     SYSTICK_Config();
     UART_Config(115200U);
-    // ESP8684_Init();
+    ESP8684_Init();
 
     // char str[128];
     // char s1[] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a};
@@ -48,6 +48,6 @@ int main(void)
     // printf("================End======================\r\n");
     while(1)
     {
-        // WIFI_Run();
+        WIFI_Run();
     }
 }

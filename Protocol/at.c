@@ -26,6 +26,7 @@ struct AT_FSM
 };
 
 static COMM_STATE_t __onSend(void);
+static bool __flagBusy = false;
 static COMM_STATE_t __onWait(void);
 static COMM_STATE_t __onReceive(void);
 
@@ -40,7 +41,10 @@ COMM_STATE_t AT_CmdHandler(const AT_Cmd_t* cmd)
 static COMM_STATE_t __onSend(void)
 {
 #if DEBUG_PRINTING
-    printf("[AT] Sending: [%s]\n", __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+    if(__atFSM.currentCmd->cmd)
+        printf("[AT] Sending: [%s]\n", __atFSM.currentCmd->cmd);
+    else
+        printf("[AT] Delaying\n");
 #endif
     if(__atFSM.currentCmd->cmd != NULL)
     {
@@ -58,20 +62,18 @@ static COMM_STATE_t __onWait(void)
     {
         retry = 0;
         ESP8684_SnapshotResponse(__atResponseSnapshot);
-#if DEBUG_PRINTING
-        printf("[AT] Received: [%s], expected: [%s]\n", __atResponseSnapshot, __atFSM.currentCmd->desiredResponse);
-#endif
         __atFSM.stateHandler = __onReceive;
         return COMM_STATE_PROCESSING;
     }
-    else if((SYSTICK_GetSysRunTime() - __atFSM.sentCmdTime) >= __atFSM.currentCmd->timeoutMs)
+    else if((SYSTICK_GetSysRunTime() - __atFSM.sentCmdTime) >=
+            __atFSM.currentCmd->timeoutMs + __flagBusy * AT_BUSY_DELAY_MS)
     {
+        __flagBusy           = false;
         __atFSM.stateHandler = __onSend;
         if(retry < __atFSM.currentCmd->maxRetry)
         {
 #if DEBUG_PRINTING
-            printf("[AT] Timed out when sending [%s], retrying\n",
-                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "[delay]");
+            printf("[Error(retry) AT] Timeout [%s]\n", __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
 #endif
             retry++;
             return COMM_STATE_PROCESSING;
@@ -79,8 +81,10 @@ static COMM_STATE_t __onWait(void)
         else
         {
 #if DEBUG_PRINTING
-            printf("[AT FAILED] Timed out when sending [%s]\n",
-                   __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
+            if(__atFSM.currentCmd->cmd)
+                printf("[Error(fail) AT] Timeout [%s]\n", __atFSM.currentCmd->cmd);
+            else
+                printf("[AT] Delay Done\n");
 #endif
             retry              = 0;
             __atFSM.currentCmd = NULL;
@@ -90,7 +94,7 @@ static COMM_STATE_t __onWait(void)
     return COMM_STATE_PROCESSING;
 }
 
-static const char* __ASYNC_RESPONSE_LIST[] = {"WIFI CONNECTED", "WIFI DISCONNECTED", "busy", "ready"};
+static const char* __ASYNC_RESPONSE_LIST[] = {"CONNECTED", "DISCONNECT", "ready"};
 
 static bool __IsAsyncResponse(void)
 {
@@ -109,25 +113,41 @@ static COMM_STATE_t __onReceive(void)
     static uint8_t retry = 0;
     if(strstr(__atResponseSnapshot, __atFSM.currentCmd->desiredResponse) != NULL)
     {
+#if DEBUG_PRINTING
+        printf("[AT(success)] Receive matched[%s]\n", __atResponseSnapshot);
+#endif
         __atFSM.stateHandler = __onSend;
         retry                = 0;
         return COMM_STATE_OK;
     }
+    else if(strstr(__atResponseSnapshot, "busy") != NULL)
+    {
+#if DEBUG_PRINTING
+        printf("[AT(busy)] Module is busy\n");
+#endif
+        __flagBusy           = true;
+        __atFSM.stateHandler = __onWait;
+        return COMM_STATE_PROCESSING;
+    }
     else if(__IsAsyncResponse())
     {
 #if DEBUG_PRINTING
-        printf("[AT] Recv Async Response [%s], keep waiting\n", __atResponseSnapshot);
+        printf("[AT(waiting)] Recv Async Response [%s]\n", __atResponseSnapshot);
 #endif
         __atFSM.stateHandler = __onWait;
         return COMM_STATE_PROCESSING;
     }
     else
     {
+#if DEBUG_PRINTING
+        printf("[Error(log) AT] Received: [%s], expected: [%s]\n", __atResponseSnapshot,
+               __atFSM.currentCmd->desiredResponse);
+#endif
         __atFSM.stateHandler = __onSend;
         if(retry < __atFSM.currentCmd->maxRetry)
         {
 #if DEBUG_PRINTING
-            printf("[AT] Recv Error when sending [%s], retrying...\n",
+            printf("[Error(retry) AT] unmatched response [%s]\n",
                    __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
 #endif
             retry++;
@@ -136,7 +156,7 @@ static COMM_STATE_t __onReceive(void)
         else
         {
 #if DEBUG_PRINTING
-            printf("[AT FAILED] Recv Error when sending [%s]\n",
+            printf("[Error(fail) AT] unmatched response [%s]\n",
                    __atFSM.currentCmd->cmd ? __atFSM.currentCmd->cmd : "delay");
 #endif
             retry              = 0;
