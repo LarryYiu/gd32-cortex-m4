@@ -389,31 +389,11 @@
               <FileType>1</FileType>
               <FilePath>.\App\main.c</FilePath>
             </File>
-            <File>
-              <FileName>wifi_app.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\App\wifi_app.c</FilePath>
-            </File>
-            <File>
-              <FileName>iot_config.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\App\iot_config.h</FilePath>
-            </File>
-            <File>
-              <FileName>flash_app.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\App\flash_app.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>Driver</GroupName>
           <Files>
-            <File>
-              <FileName>exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\exti.c</FilePath>
-            </File>
             <File>
               <FileName>dwt_delay.c</FileName>
               <FileType>1</FileType>
@@ -440,41 +420,6 @@
               <FilePath>.\Driver\uart.c</FilePath>
             </File>
             <File>
-              <FileName>systick.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\systick.c</FilePath>
-            </File>
-            <File>
-              <FileName>key_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\key_driver.c</FilePath>
-            </File>
-            <File>
-              <FileName>timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>pwm_capture.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\pwm_capture.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>esp8684_driver.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Driver\esp8684_driver.c</FilePath>
-            </File>
-            <File>
               <FileName>internal_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Driver\internal_flash.c</FilePath>
@@ -484,16 +429,6 @@
         <Group>
           <GroupName>GD32_lib</GroupName>
           <Files>
-            <File>
-              <FileName>gd32f30x_libopt.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\GD32_lib\gd32f30x_libopt.h</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_exti.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_exti.c</FilePath>
-            </File>
             <File>
               <FileName>gd32f30x_gpio.c</FileName>
               <FileType>1</FileType>
@@ -515,36 +450,6 @@
               <FilePath>.\GD32_lib\Source\gd32f30x_rcu.c</FilePath>
             </File>
             <File>
-              <FileName>gd32f30x_dma.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_dma.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_timer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_timer.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_adc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_bkp.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_bkp.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_rtc.c</FilePath>
-            </File>
-            <File>
-              <FileName>gd32f30x_pmu.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GD32_lib\Source\gd32f30x_pmu.c</FilePath>
-            </File>
-            <File>
               <FileName>gd32f30x_fmc.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GD32_lib\Source\gd32f30x_fmc.c</FilePath>
@@ -563,21 +468,6 @@
               <FileName>startup_gd32f30x_hd.s</FileName>
               <FileType>2</FileType>
               <FilePath>.\Arm_kernel\startup_gd32f30x_hd.s</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>Protocol</GroupName>
-          <Files>
-            <File>
-              <FileName>ir_nec_parser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Protocol\ir_nec_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>at.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Protocol\at.c</FilePath>
             </File>
           </Files>
         </Group>
